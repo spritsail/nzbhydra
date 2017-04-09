@@ -14,4 +14,4 @@ USER $UNAME
 
 VOLUME ["/config"]
 EXPOSE 8081
-CMD [ "/usr/bin/python", "/hydra/nzbhydra.py", "--nobrowser", "--config","/config/settings.cfg", "--database","/config/nzbhydra.db", "--logfile","/dev/stdout" ]
+CMD [ "/usr/bin/python", "/hydra/nzbhydra.py", "--nobrowser", "--config","/config/settings.cfg", "--database","/config/nzbhydra.db" ]
