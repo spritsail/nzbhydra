@@ -29,10 +29,12 @@ pipeline:
     environment:
        - DOCKER_HOST=tcp://docker:2375
     commands:
-       - apk add --no-cache openssl
+       - apk add --no-cache openssl jq
+       - export CURVER=$(wget -O- https://api.github.com/repos/theotherp/nzbhydra/releases/latest | jq -r .tag_name)
          # Grab just the version, not the hash. Used for tagging
        - echo $DOCKER_USER
        - docker tag devbuild adamant/nzbhydra:latest
+       - docker tag devbuild adamant/nzbhydra:$CURVER
        - docker login -u $DOCKER_USER -p $DOCKER_PASS
        - docker push adamant/nzbhydra
        - echo "CONGRATS! SUCCESSFULLY BUILT SICKRAGE!"
