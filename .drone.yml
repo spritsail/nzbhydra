@@ -1,0 +1,38 @@
+services:
+  docker:
+    image: docker:dind
+    privileged: true
+
+pipeline:
+  build:
+    image: docker
+    environment:
+       - DOCKER_HOST=tcp://docker:2375
+    commands:
+       - docker build -t devbuild . 
+
+  test:
+    image: docker
+    environment:
+       - DOCKER_HOST=tcp://docker:2375
+    commands:
+      - apk add --no-cache curl
+      - docker run --name=DEV -d -p 5075:5075 --user=root devbuild # Need root for config
+      - sleep 10  # Wait for SickRage to start!
+      - docker logs DEV
+      - curl -sSL docker:5075  > /dev/null 
+      - docker kill DEV # Not really needed, but keeps things quick
+
+  publish:
+    image: docker
+    secrets: [ DOCKER_USER, DOCKER_PASS ]
+    environment:
+       - DOCKER_HOST=tcp://docker:2375
+    commands:
+       - apk add --no-cache openssl
+         # Grab just the version, not the hash. Used for tagging
+       - echo $DOCKER_USER
+       - docker tag devbuild adamant/nzbhydra:latest
+       - docker login -u $DOCKER_USER -p $DOCKER_PASS
+       - docker push adamant/nzbhydra
+       - echo "CONGRATS! SUCCESSFULLY BUILT SICKRAGE!"
