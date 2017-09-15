@@ -1,40 +1,36 @@
-services:
-  docker:
-    image: docker:dind
-    privileged: true
-
 pipeline:
   build:
     image: docker
-    environment:
-       - DOCKER_HOST=tcp://docker:2375
+    volumes:
+       - /var/run/docker.sock:/var/run/docker.sock
     commands:
-       - docker build -t devbuild . 
+       - docker build -t hydra-dev . 
 
   test:
     image: docker
-    environment:
-       - DOCKER_HOST=tcp://docker:2375
+    volumes:
+       - /var/run/docker.sock:/var/run/docker.sock
     commands:
       - apk add --no-cache curl
-      - docker run --name=DEV -d -p 5075:5075 --user=root devbuild # Need root for config
+      - CON_NAME=$(docker run --rm -d -p 5075:5075 --user=root hydra-dev) # Need root for config
       - sleep 10  # Wait for SickRage to start!
-      - docker logs DEV
-      - curl -sSL docker:5075  > /dev/null 
-      - docker kill DEV # Not really needed, but keeps things quick
+      - docker logs $$CON_NAME
+      - curl -sSL  --max-time 3 --retry 5 --retry-delay 5 $(docker inspect --format='{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' $$CON_NAME):5075  > /dev/null 
+      - docker kill $$CON_NAME # Not really needed, but keeps things quick
 
   publish:
     image: docker
     secrets: [ DOCKER_USER, DOCKER_PASS ]
-    environment:
-       - DOCKER_HOST=tcp://docker:2375
+    volumes:
+       - /var/run/docker.sock:/var/run/docker.sock
     commands:
        - apk add --no-cache openssl jq
        - export CURVER=$(wget -O- https://api.github.com/repos/theotherp/nzbhydra/releases/latest | jq -r .tag_name)
          # Grab just the version, not the hash. Used for tagging
        - echo $DOCKER_USER
-       - docker tag devbuild adamant/nzbhydra:latest
-       - docker tag devbuild adamant/nzbhydra:$CURVER
+       - docker tag hydra-dev adamant/nzbhydra:latest
+       - docker tag hydra-dev adamant/nzbhydra:$CURVER
        - docker login -u $DOCKER_USER -p $DOCKER_PASS
        - docker push adamant/nzbhydra
+       - docker rmi hydra-dev adamant/nzbhydra
        - echo "CONGRATS! SUCCESSFULLY BUILT SICKRAGE!"
