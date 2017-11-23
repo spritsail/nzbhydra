@@ -14,6 +14,6 @@ EXPOSE 8081
 ENTRYPOINT [ "/sbin/tini", "--" ]
 CMD chown -R "$UID:$GID" /hydra && \
     exec su-exec "$UID:$GID" \
-        python /hydra/nzbhydra.py --nobrowser \
+        python -u /hydra/nzbhydra.py --nobrowser \
         --config /config/settings.cfg \
         --database /config/nzbhydra.db
