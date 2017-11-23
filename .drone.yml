@@ -4,7 +4,7 @@ pipeline:
     volumes:
        - /var/run/docker.sock:/var/run/docker.sock
     commands:
-       - docker build --no-cache --pull -t hydra-dev .
+      - docker build --no-cache --pull -t hydra-dev .
 
   test:
     image: docker
@@ -12,10 +12,11 @@ pipeline:
        - /var/run/docker.sock:/var/run/docker.sock
     commands:
       - apk add --no-cache curl
-      - CON_NAME=$(docker run --rm -d -p 5075:5075 --user=root hydra-dev) # Need root for config
-      - sleep 10  # Wait for SickRage to start!
-      - docker logs $$CON_NAME
-      - curl -sSL  --max-time 3 --retry 5 --retry-delay 5 $(docker inspect --format='{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' $$CON_NAME):5075  > /dev/null 
+      - CON_NAME=$(docker run --rm -dt -e UID=0 hydra-dev)
+      - timeout -t 15 docker logs -f $$CON_NAME &
+      - sleep 10
+      - IPADDR=$(docker inspect --format='{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' $$CON_NAME)
+      - curl -L --max-time 3 --retry 5 --retry-delay 5 --retry-connrefused $$IPADDR:5075  > /dev/null 
       - docker kill $$CON_NAME # Not really needed, but keeps things quick
 
   publish:
