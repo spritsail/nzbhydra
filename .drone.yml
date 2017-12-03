@@ -12,7 +12,7 @@ pipeline:
        - /var/run/docker.sock:/var/run/docker.sock
     commands:
       - apk add --no-cache curl
-      - CON_NAME=$(docker run --rm -dt -e UID=0 hydra-dev)
+      - CON_NAME=$(docker run --rm -dt -e SUID=0 hydra-dev)
       - timeout -t 15 docker logs -f $$CON_NAME &
       - sleep 10
       - IPADDR=$(docker inspect --format='{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' $$CON_NAME)
