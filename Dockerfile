@@ -3,7 +3,7 @@ MAINTAINER Adam Dodman <adam.dodman@gmx.com>
 
 ENV SUID=907 SGID=900
 
-RUN apk add --no-cache git python tini \
+RUN apk add --no-cache git python py-lxml tini \
  && wget -O /sbin/su-exec https://github.com/frebib/su-exec/releases/download/v0.3/su-exec-alpine-$(uname -m) \
  && chmod 755 /sbin/su-exec \
  \
