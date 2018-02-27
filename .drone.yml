@@ -56,4 +56,4 @@ pipeline:
        - for tag in "beta" "$(cat .nzbhydra_tag)-beta"; do
              docker rmi adamant/nzbhydra:$tag;
          done
-       - echo "CONGRATS! SUCCESSFULLY BUILT SICKRAGE!"
+       - echo "CONGRATS! SUCCESSFULLY BUILT NZBHYDRA!"
