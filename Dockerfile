@@ -5,7 +5,7 @@ ENV SUID=907 SGID=900
 ENV MAXMEM=128M
 ENV NZBHYDRA_DIR=/usr/lib/nzbhydra
 
-ARG NZBHYDRA_VER=1.4.5
+ARG NZBHYDRA_VER=1.4.6
 ARG NZBHYDRA_URL="https://github.com/theotherp/nzbhydra2/releases/download/v${NZBHYDRA_VER}/nzbhydra2-${NZBHYDRA_VER}-linux.zip"
 
 LABEL org.label-schema.name="NZBHydra 2" \
