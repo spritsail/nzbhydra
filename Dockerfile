@@ -1,17 +1,19 @@
 FROM alpine:3.7
-LABEL maintainer="Adam Dodman <docker@adam-ant.co.uk>"
+
+ARG NZBHYDRA_VER=1.4.8
+ARG NZBHYDRA_URL="https://github.com/theotherp/nzbhydra2/releases/download/v${NZBHYDRA_VER}/nzbhydra2-${NZBHYDRA_VER}-linux.zip"
 
 ENV SUID=907 SGID=900
 ENV MAXMEM=128M
 ENV NZBHYDRA_DIR=/usr/lib/nzbhydra
 
-ARG NZBHYDRA_VER=1.4.7
-ARG NZBHYDRA_URL="https://github.com/theotherp/nzbhydra2/releases/download/v${NZBHYDRA_VER}/nzbhydra2-${NZBHYDRA_VER}-linux.zip"
-
-LABEL org.label-schema.name="NZBHydra 2" \
-      org.label-schema.vcs-url="https://github.com/theotherp/nzbhydra2" \
-      org.label-schema.version=$NZBHYDRA_VER \
-      org.label-schema.schema-version="1.0"
+LABEL maintainer="Spritsail <nzbhydra@spritsail.io>" \
+      org.label-schema.vendor="Spritsail" \
+      org.label-schema.name="NZBHydra 2" \
+      org.label-schema.url="https://github.com/theotherp/nzbhydra2" \
+      org.label-schema.description="NZBHydra is a meta search for NZB indexers" \
+      org.label-schema.version=${NZBHYDRA_VER} \
+      io.spritsail.version.nzbhydra=${NZBHYDRA_VER}
 
 RUN apk add --no-cache openjdk8 tini \
  && wget -O /sbin/su-exec https://github.com/frebib/su-exec/releases/download/v0.3/su-exec-alpine-$(uname -m) \

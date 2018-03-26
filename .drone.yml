@@ -2,30 +2,26 @@ pipeline:
   identify:
     image: docker
     commands:
-      # Grab the current version, prevents race conditions
       - apk add --no-cache curl jq
+      - set -o pipefail
       - curl -fL https://api.github.com/repos/theotherp/nzbhydra2/releases/latest 
           | jq -r .tag_name
           | tee /dev/stderr
           | tr -d 'v' > .nzbhydra_tag
 
   build:
-    image: docker
-    volumes:
-       - /var/run/docker.sock:/var/run/docker.sock
-    commands:
-      - docker build
-            --no-cache --pull
-            --build-arg NZBHYDRA_VER=$(cat .nzbhydra_tag)
-            -t hydra-dev .
+    image: spritsail/docker-build
+    volumes: [ '/var/run/docker.sock:/var/run/docker.sock' ]
+    repo: nzbhydra-dev
+    build_args:
+      - 'NZBHYDRA_VER=%file: .nzbhydra_tag'
 
   test:
     image: docker
-    volumes:
-       - /var/run/docker.sock:/var/run/docker.sock
+    volumes: [ '/var/run/docker.sock:/var/run/docker.sock' ]
     commands:
       - apk add --no-cache curl
-      - CON_NAME=$(docker run -dt -e SUID=0 hydra-dev)
+      - CON_NAME=$(docker run -dt -e SUID=0 nzbhydra-dev)
       - timeout -t 12 -- docker logs -f $$CON_NAME | cat &
       - sleep 10
       - IP=$(docker inspect --format='{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' $$CON_NAME)
@@ -40,20 +36,21 @@ pipeline:
       - docker rm $$CON_NAME
 
   publish:
-    image: docker
-    secrets: [ DOCKER_USER, DOCKER_PASS ]
-    when:
-      event: [ push, tag, deployment ]
-    volumes:
-       - /var/run/docker.sock:/var/run/docker.sock
-    commands:
-       - docker login -u $DOCKER_USER -p $DOCKER_PASS
-       - for tag in "beta" "$(cat .nzbhydra_tag)-beta"; do
-             docker tag hydra-dev adamant/nzbhydra:$tag;
-             docker push adamant/nzbhydra:$tag;
-         done
-       - docker rmi hydra-dev
-       - for tag in "beta" "$(cat .nzbhydra_tag)-beta"; do
-             docker rmi adamant/nzbhydra:$tag;
-         done
-       - echo "CONGRATS! SUCCESSFULLY BUILT NZBHYDRA!"
+    image: spritsail/docker-publish
+    when: { event: [ push, tag, deployment ] }
+    volumes: [ '/var/run/docker.sock:/var/run/docker.sock' ]
+    secrets: [ docker_username, docker_password, microbadger_token ]
+    from: nzbhydra-dev
+    repo: spritsail/nzbhydra
+    tags:
+      - 'latest'
+      - 'v2'
+      - '%fileauto: .nzbhydra_tag'
+
+  notify:
+    image: appleboy/drone-telegram
+    when: { status: [ success, failure ] }
+    secrets: [ telegram_token, telegram_to ]
+    message: |
+      *{{repo.owner}}/{{repo.name}} [{{commit.branch}}]*: Build #{{build.number}}: *{{uppercase build.status}}*
+      {{build.link}}
