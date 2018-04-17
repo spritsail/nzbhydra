@@ -1,6 +1,6 @@
 pipeline:
   identify:
-    image: docker
+    image: alpine
     commands:
       - apk add --no-cache curl jq
       - set -o pipefail
@@ -37,7 +37,7 @@ pipeline:
 
   publish:
     image: spritsail/docker-publish
-    when: { event: [ push, tag, deployment ] }
+    when: { branch: [ master ], event: [ push, tag, deployment ] }
     volumes: [ '/var/run/docker.sock:/var/run/docker.sock' ]
     secrets: [ docker_username, docker_password, microbadger_token ]
     from: nzbhydra-dev
@@ -48,9 +48,6 @@ pipeline:
       - '%fileauto: .nzbhydra_tag'
 
   notify:
-    image: appleboy/drone-telegram
+    image: spritsail/notify
     when: { status: [ success, failure ] }
-    secrets: [ telegram_token, telegram_to ]
-    message: |
-      *{{repo.owner}}/{{repo.name}} [{{commit.branch}}]*: Build #{{build.number}}: *{{uppercase build.status}}*
-      {{build.link}}
+    secrets: [ webhook_url, notify_token ]
