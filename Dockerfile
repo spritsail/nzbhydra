@@ -1,4 +1,4 @@
-FROM alpine:3.7
+FROM spritsail/alpine:3.7
 
 ARG NZBHYDRA_VER=1.4.8
 ARG NZBHYDRA_URL="https://github.com/theotherp/nzbhydra2/releases/download/v${NZBHYDRA_VER}/nzbhydra2-${NZBHYDRA_VER}-linux.zip"
@@ -15,13 +15,10 @@ LABEL maintainer="Spritsail <nzbhydra@spritsail.io>" \
       org.label-schema.version=${NZBHYDRA_VER} \
       io.spritsail.version.nzbhydra=${NZBHYDRA_VER}
 
-RUN apk add --no-cache openjdk8 tini \
- && wget -O /sbin/su-exec https://github.com/frebib/su-exec/releases/download/v0.3/su-exec-alpine-$(uname -m) \
- && chmod 755 /sbin/su-exec
-
 WORKDIR $NZBHYDRA_DIR
 
-RUN wget -O /tmp/nzbhydra2.zip $NZBHYDRA_URL \
+RUN apk add --no-cache openjdk8 tini \
+ && wget -O /tmp/nzbhydra2.zip $NZBHYDRA_URL \
  && unzip -d /tmp /tmp/nzbhydra2.zip \
  && cp /tmp/lib/core-${NZBHYDRA_VER}-exec.jar \
        /tmp/LICENSE /tmp/changelog.md . \
