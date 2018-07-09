@@ -17,5 +17,5 @@ This image uses a user with UID 907. Make sure this user has write access to the
 ## Example Run Command
 
 ```bash
-docker run -d --restart=on-error:10 --name nzbhydra -v /host/path/to/config:/config -p 5076:5076 spritsail/nzbhydra
+docker run -d --restart=on-failure:10 --name nzbhydra -v /host/path/to/config:/config -p 5076:5076 spritsail/nzbhydra
 ```
