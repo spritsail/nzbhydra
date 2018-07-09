@@ -1,20 +1,8 @@
 pipeline:
-  identify:
-    image: alpine
-    commands:
-      - apk add --no-cache curl jq
-      - set -o pipefail
-      - curl -fL https://api.github.com/repos/theotherp/nzbhydra2/releases/latest 
-          | jq -r .tag_name
-          | tee /dev/stderr
-          | tr -d 'v' > .nzbhydra_tag
-
   build:
     image: spritsail/docker-build
     volumes: [ '/var/run/docker.sock:/var/run/docker.sock' ]
     repo: nzbhydra-dev
-    build_args:
-      - 'NZBHYDRA_VER=%file: .nzbhydra_tag'
 
   test:
     image: docker
@@ -45,7 +33,7 @@ pipeline:
     tags:
       - 'latest'
       - 'v2'
-      - '%fileauto: .nzbhydra_tag'
+      - '%labelauto: io.spritsail.version.nzbhydra'
 
   notify:
     image: spritsail/notify
