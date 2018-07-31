@@ -1,10 +1,10 @@
 FROM spritsail/alpine:3.8
 
-ARG NZBHYDRA_VER=1.5.1
+ARG NZBHYDRA_VER=1.5.2
 ARG NZBHYDRA_URL="https://github.com/theotherp/nzbhydra2/releases/download/v${NZBHYDRA_VER}/nzbhydra2-${NZBHYDRA_VER}-linux.zip"
 
 ENV SUID=907 SGID=900
-ENV MAXMEM=128M
+ENV MAXMEM=256M
 ENV NZBHYDRA_DIR=/usr/lib/nzbhydra
 
 LABEL maintainer="Spritsail <nzbhydra@spritsail.io>" \
