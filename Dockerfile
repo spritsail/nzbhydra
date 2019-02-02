@@ -3,6 +3,9 @@ FROM spritsail/alpine:3.9
 ARG NZBHYDRA_VER=2.3.3
 ARG NZBHYDRA_URL="https://github.com/theotherp/nzbhydra2/releases/download/v${NZBHYDRA_VER}/nzbhydra2-${NZBHYDRA_VER}-linux.zip"
 
+ARG YQ_VER=2.2.1
+ARG YQ_ARCH=amd64
+
 ENV SUID=907 SGID=900
 ENV MAXMEM=256M
 ENV NZBHYDRA_DIR=/usr/lib/nzbhydra
@@ -22,6 +25,8 @@ RUN apk add --no-cache openjdk8 tini \
  && unzip -d /tmp /tmp/nzbhydra2.zip \
  && cp /tmp/lib/core-${NZBHYDRA_VER}-exec.jar \
        /tmp/LICENSE /tmp/changelog.md . \
+ && wget -O /usr/bin/yq https://github.com/mikefarah/yq/releases/download/${YQ_VER}/yq_linux_${YQ_ARCH} \
+ && chmod 755 /usr/bin/yq \
  && rm -rf /tmp/*
 
 VOLUME ["/config"]
@@ -29,6 +34,9 @@ EXPOSE 5076
 
 # Keep version argument for runtime
 ENV NZBHYDRA_VER=${NZBHYDRA_VER}
+
+HEALTHCHECK --start-period=20s --timeout=5s \
+    CMD wget -SO/dev/null "http://localhost:5076$(yq read /config/nzbhydra.yml main.urlBase)/api/stats?apikey=$(yq read /config/nzbhydra.yml main.apiKey)"
 
 ENTRYPOINT ["/sbin/tini", "--", "su-exec", "--env"]
 CMD mkdir -p /config/logs && \
