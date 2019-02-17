@@ -20,7 +20,7 @@ LABEL maintainer="Spritsail <nzbhydra@spritsail.io>" \
 
 WORKDIR $NZBHYDRA_DIR
 
-RUN apk add --no-cache openjdk8 tini \
+RUN apk add --no-cache openjdk8 \
  && wget -O /tmp/nzbhydra2.zip $NZBHYDRA_URL \
  && unzip -d /tmp /tmp/nzbhydra2.zip \
  && cp /tmp/lib/core-${NZBHYDRA_VER}-exec.jar \
