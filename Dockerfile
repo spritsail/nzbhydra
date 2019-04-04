@@ -1,6 +1,6 @@
 FROM spritsail/alpine:3.9
 
-ARG NZBHYDRA_VER=2.3.21
+ARG NZBHYDRA_VER=2.3.22
 ARG NZBHYDRA_URL="https://github.com/theotherp/nzbhydra2/releases/download/v${NZBHYDRA_VER}/nzbhydra2-${NZBHYDRA_VER}-linux.zip"
 
 ARG YQ_VER=2.2.1
@@ -29,7 +29,7 @@ RUN apk add --no-cache openjdk8-jre nss \
  && chmod 755 /usr/bin/yq \
  && rm -rf /tmp/*
 
-VOLUME ["/config"]
+VOLUME ["/config", "/logs"]
 EXPOSE 5076
 
 # Keep version argument for runtime
