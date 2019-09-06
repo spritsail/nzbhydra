@@ -1,28 +1,62 @@
-pipeline:
-  build:
-    image: spritsail/docker-build
-    volumes: [ '/var/run/docker.sock:/var/run/docker.sock' ]
+---
+kind: pipeline
+name: default
+
+platform:
+  os: linux
+  arch: amd64
+
+steps:
+- name: build
+  pull: if-not-exists
+  image: spritsail/docker-build
+  settings:
     repo: nzbhydra-dev
 
-  test:
-    image: spritsail/docker-test
-    volumes: [ '/var/run/docker.sock:/var/run/docker.sock' ]
+- name: test
+  pull: if-not-exists
+  image: spritsail/docker-test
+  settings:
+    curl: :5076
     repo: nzbhydra-dev
     run_args: -e SUID=0
-    curl: ':5076'
 
-  publish:
-    image: spritsail/docker-publish
-    when: { branch: [ master ], event: [ push, tag, deployment ] }
-    volumes: [ '/var/run/docker.sock:/var/run/docker.sock' ]
-    secrets: [ docker_username, docker_password, microbadger_token ]
+- name: publish
+  pull: if-not-exists
+  image: spritsail/docker-publish
+  settings:
     from: nzbhydra-dev
     repo: spritsail/nzbhydra
     tags:
-      - 'latest'
-      - '%label io.spritsail.version.nzbhydra | %auto'
+    - latest
+    - "%label io.spritsail.version.nzbhydra | %auto"
+  environment:
+    DOCKER_PASSWORD:
+      from_secret: docker_password
+    DOCKER_USERNAME:
+      from_secret: docker_username
+  when:
+    branch:
+    - master
+    event:
+    - push
+    - tag
 
-  notify:
-    image: spritsail/notify
-    when: { status: [ success, failure ] }
-    secrets: [ webhook_url, notify_token ]
+- name: notify
+  pull: if-not-exists
+  image: spritsail/notify
+  environment:
+    NOTIFY_TOKEN:
+      from_secret: notify_token
+    WEBHOOK_URL:
+      from_secret: webhook_url
+  when:
+    status:
+    - success
+    - failure
+
+---
+kind: signature
+hmac: 710a40c17f7a3f72b58aff943cc870c712f12bb519c17d5c963d396f2f077097
+
+...
