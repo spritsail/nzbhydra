@@ -29,7 +29,7 @@ RUN apk add --no-cache openjdk8-jre nss \
  && chmod 755 /usr/bin/yq \
  && rm -rf /tmp/*
 
-VOLUME ["/config", "/logs"]
+VOLUME ["/config"]
 EXPOSE 5076
 
 # Keep version argument for runtime
@@ -38,11 +38,13 @@ ENV NZBHYDRA_VER=${NZBHYDRA_VER}
 HEALTHCHECK --start-period=20s --timeout=5s \
     CMD wget -SO/dev/null "http://localhost:5076$(yq read /config/nzbhydra.yml main.urlBase)/api/stats?apikey=$(yq read /config/nzbhydra.yml main.apiKey)"
 
+ENV LOGDIR=/config/logs
+
 ENTRYPOINT ["/sbin/tini", "--", "su-exec", "--env"]
-CMD mkdir -p /config/logs && \
+CMD mkdir -p ${LOGDIR} && \
     exec java -Xmx${MAXMEM} -DfromWrapper -noverify \
         -XX:TieredStopAtLevel=1 \
-        -Xloggc:/config/logs/gclog-$(date +"%F_%H-%M-%S").log \
+        -Xloggc:${LOGDIR}/gclog-$(date +"%F_%H-%M-%S").log \
         -XX:+PrintGCDetails \
         -XX:+PrintGCTimeStamps \
         -XX:+PrintTenuringDistribution \
