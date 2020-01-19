@@ -8,13 +8,13 @@ platform:
 
 steps:
 - name: build
-  pull: if-not-exists
+  pull: always
   image: spritsail/docker-build
   settings:
     repo: nzbhydra-dev
 
 - name: test
-  pull: if-not-exists
+  pull: always
   image: spritsail/docker-test
   settings:
     curl: :5076
@@ -22,7 +22,7 @@ steps:
     run_args: -e SUID=0
 
 - name: publish
-  pull: if-not-exists
+  pull: always
   image: spritsail/docker-publish
   settings:
     from: nzbhydra-dev
@@ -30,33 +30,18 @@ steps:
     tags:
     - latest
     - "%label io.spritsail.version.nzbhydra | %auto"
-  environment:
-    DOCKER_PASSWORD:
-      from_secret: docker_password
-    DOCKER_USERNAME:
+    username:
       from_secret: docker_username
+    password:
+      from_secret: docker_password
   when:
     branch:
     - master
     event:
     - push
-    - tag
-
-- name: notify
-  pull: if-not-exists
-  image: spritsail/notify
-  environment:
-    NOTIFY_TOKEN:
-      from_secret: notify_token
-    WEBHOOK_URL:
-      from_secret: webhook_url
-  when:
-    status:
-    - success
-    - failure
 
 ---
 kind: signature
-hmac: 710a40c17f7a3f72b58aff943cc870c712f12bb519c17d5c963d396f2f077097
+hmac: 1be31bf8afcd798187ecb2033a91c2014a79fe5a976c18049730fc3599ff5b7d
 
 ...
