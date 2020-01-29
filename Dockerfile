@@ -1,9 +1,9 @@
 FROM spritsail/alpine:3.11
 
-ARG NZBHYDRA_VER=2.11.2
+ARG NZBHYDRA_VER=2.12.6
 ARG NZBHYDRA_URL="https://github.com/theotherp/nzbhydra2/releases/download/v${NZBHYDRA_VER}/nzbhydra2-${NZBHYDRA_VER}-linux.zip"
 
-ARG YQ_VER=2.4.0
+ARG YQ_VER=2.4.1
 ARG YQ_ARCH=amd64
 
 ENV SUID=907 SGID=900
