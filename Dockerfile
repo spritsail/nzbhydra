@@ -1,6 +1,6 @@
 FROM spritsail/alpine:3.11
 
-ARG NZBHYDRA_VER=2.17.5
+ARG NZBHYDRA_VER=2.20.7
 ARG NZBHYDRA_URL="https://github.com/theotherp/nzbhydra2/releases/download/v${NZBHYDRA_VER}/nzbhydra2-${NZBHYDRA_VER}-linux.zip"
 
 ARG YQ_VER=3.2.1
