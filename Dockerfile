@@ -1,6 +1,6 @@
 FROM spritsail/alpine:3.13
 
-ARG NZBHYDRA_VER=3.13.0
+ARG NZBHYDRA_VER=3.14.0
 ARG NZBHYDRA_URL="https://github.com/theotherp/nzbhydra2/releases/download/v${NZBHYDRA_VER}/nzbhydra2-${NZBHYDRA_VER}-linux.zip"
 
 ARG YQ_VER=v4.6.1
@@ -20,7 +20,7 @@ LABEL maintainer="Spritsail <nzbhydra@spritsail.io>" \
 
 WORKDIR $NZBHYDRA_DIR
 
-RUN apk add --no-cache openjdk8-jre nss \
+RUN apk add --no-cache openjdk11-jre nss \
  && wget -O /tmp/nzbhydra2.zip $NZBHYDRA_URL \
  && unzip -d /tmp /tmp/nzbhydra2.zip \
  && cp /tmp/lib/core-${NZBHYDRA_VER}-exec.jar \
@@ -44,14 +44,7 @@ ENTRYPOINT ["/sbin/tini", "--", "su-exec", "--env"]
 CMD mkdir -p ${LOGDIR} && \
     exec java -Xmx${MAXMEM} -DfromWrapper -noverify \
         -XX:TieredStopAtLevel=1 \
-        -Xloggc:${LOGDIR}/gclog-$(date +"%F_%H-%M-%S").log \
-        -XX:+PrintGCDetails \
-        -XX:+PrintGCTimeStamps \
-        -XX:+PrintTenuringDistribution \
-        -XX:+PrintGCCause \
-        -XX:+UseGCLogFileRotation \
-        -XX:NumberOfGCLogFiles=10 \
-        -XX:GCLogFileSize=5M \
+        -Xlog:gc:${LOGDIR}/gclog-$(date +"%F_%H-%M-%S").log \
         -Dspring.output.ansi.enabled=ALWAYS \
         -jar $NZBHYDRA_DIR/core-${NZBHYDRA_VER}-exec.jar \
         --datafolder /config
