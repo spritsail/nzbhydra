@@ -3,7 +3,7 @@ FROM spritsail/alpine:3.13
 ARG NZBHYDRA_VER=3.14.2
 ARG NZBHYDRA_URL="https://github.com/theotherp/nzbhydra2/releases/download/v${NZBHYDRA_VER}/nzbhydra2-${NZBHYDRA_VER}-linux.zip"
 
-ARG YQ_VER=v4.6.1
+ARG YQ_VER=v4.9.3
 ARG YQ_ARCH=amd64
 
 ENV SUID=907 SGID=900
@@ -36,7 +36,7 @@ EXPOSE 5076
 ENV NZBHYDRA_VER=${NZBHYDRA_VER}
 
 HEALTHCHECK --start-period=20s --timeout=5s \
-    CMD wget -SO/dev/null "http://localhost:5076$(yq read /config/nzbhydra.yml main.urlBase)/api/stats?apikey=$(yq read /config/nzbhydra.yml main.apiKey)"
+    CMD wget -SO/dev/null "$(yq e '["http://",.main.host,":",.main.port,.main.urlBase,"/api/stats?apikey=",.main.apiKey]|join("")' /config/nzbhydra.yml)"
 
 ENV LOGDIR=/config/logs
 
