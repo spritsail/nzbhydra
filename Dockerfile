@@ -4,7 +4,6 @@ ARG NZBHYDRA_VER=4.3.3
 ARG NZBHYDRA_URL="https://github.com/theotherp/nzbhydra2/releases/download/v${NZBHYDRA_VER}/nzbhydra2-${NZBHYDRA_VER}-linux.zip"
 
 ARG YQ_VER=v4.25.2
-ARG YQ_ARCH=amd64
 
 ENV SUID=907 SGID=900
 ENV MAXMEM=256M
@@ -21,7 +20,8 @@ LABEL maintainer="Spritsail <nzbhydra@spritsail.io>" \
 
 WORKDIR $NZBHYDRA_DIR
 
-RUN apk add --no-cache openjdk11-jre nss \
+RUN if [ "$(uname -m)" = "aarch64" ]; then YQ_ARCH=arm64; else YQ_ARCH=amd64; fi \
+ && apk add --no-cache openjdk11-jre nss \
  && wget -O /tmp/nzbhydra2.zip $NZBHYDRA_URL \
  && unzip -d /tmp /tmp/nzbhydra2.zip \
  && cp /tmp/lib/core-${NZBHYDRA_VER}-exec.jar \
