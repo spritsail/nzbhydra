@@ -21,7 +21,7 @@ LABEL maintainer="Spritsail <nzbhydra@spritsail.io>" \
 WORKDIR $NZBHYDRA_DIR
 
 RUN if [ "$(uname -m)" = "aarch64" ]; then YQ_ARCH=arm64; else YQ_ARCH=amd64; fi \
- && apk add --no-cache openjdk11-jre nss \
+ && apk add --no-cache openjdk16-jre nss \
  && wget -O /tmp/nzbhydra2.zip $NZBHYDRA_URL \
  && unzip -d /tmp /tmp/nzbhydra2.zip \
  && cp /tmp/lib/core-${NZBHYDRA_VER}-exec.jar \
