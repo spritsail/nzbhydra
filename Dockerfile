@@ -1,4 +1,4 @@
-FROM spritsail/alpine:3.14
+FROM spritsail/alpine:3.16
 
 ARG NZBHYDRA_VER=4.3.3
 ARG NZBHYDRA_URL="https://github.com/theotherp/nzbhydra2/releases/download/v${NZBHYDRA_VER}/nzbhydra2-${NZBHYDRA_VER}-linux.zip"
@@ -16,7 +16,8 @@ LABEL maintainer="Spritsail <nzbhydra@spritsail.io>" \
       org.label-schema.url="https://github.com/theotherp/nzbhydra2" \
       org.label-schema.description="NZBHydra is a meta search for NZB indexers" \
       org.label-schema.version=${NZBHYDRA_VER} \
-      io.spritsail.version.nzbhydra=${NZBHYDRA_VER}
+      io.spritsail.version.nzbhydra=${NZBHYDRA_VER} \
+      io.spritsail.version.yq=${YQ_VER}
 
 WORKDIR $NZBHYDRA_DIR
 
