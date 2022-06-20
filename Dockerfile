@@ -37,7 +37,7 @@ EXPOSE 5076
 ENV NZBHYDRA_VER=${NZBHYDRA_VER}
 
 HEALTHCHECK --start-period=20s --timeout=5s \
-    CMD wget -SO/dev/null "$(yq e '["http://",.main.host,":",.main.port,.main.urlBase,"/api/stats?apikey=",.main.apiKey]|join("")' /config/nzbhydra.yml)"
+    CMD wget -qSO/dev/null "$(yq --no-doc e '["http://",.main.host,":",.main.port,.main.urlBase,"api/stats?apikey=",.main.apiKey]|join("")' /config/nzbhydra.yml)"
 
 ENV LOGDIR=/config/logs
 
