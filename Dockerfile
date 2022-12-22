@@ -9,12 +9,11 @@ ENV SUID=907 SGID=900
 ENV MAXMEM=256M
 ENV NZBHYDRA_DIR=/usr/lib/nzbhydra
 
-LABEL maintainer="Spritsail <nzbhydra@spritsail.io>" \
-      org.label-schema.vendor="Spritsail" \
-      org.label-schema.name="NZBHydra 2" \
-      org.label-schema.url="https://github.com/theotherp/nzbhydra2" \
-      org.label-schema.description="NZBHydra is a meta search for NZB indexers" \
-      org.label-schema.version=${NZBHYDRA_VER} \
+LABEL org.opencontainers.image.authors="Spritsail <nzbhydra@spritsail.io>" \
+      org.opencontainers.image.title="NZBHydra 2" \
+      org.opencontainers.image.url="https://github.com/theotherp/nzbhydra2" \
+      org.opencontainers.image.description="NZBHydra is a meta search for NZB indexers" \
+      org.opencontainers.image.version=${NZBHYDRA_VER} \
       io.spritsail.version.nzbhydra=${NZBHYDRA_VER} \
       io.spritsail.version.yq=${YQ_VER}
 
