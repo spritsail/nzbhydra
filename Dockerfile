@@ -3,7 +3,7 @@ FROM spritsail/alpine:3.17
 ARG NZBHYDRA_VER=4.7.6
 ARG NZBHYDRA_URL="https://github.com/theotherp/nzbhydra2/releases/download/v${NZBHYDRA_VER}/nzbhydra2-${NZBHYDRA_VER}-linux.zip"
 
-ARG YQ_VER=v4.30.7
+ARG YQ_VER=v4.30.8
 
 ENV SUID=907 SGID=900
 ENV MAXMEM=256M
